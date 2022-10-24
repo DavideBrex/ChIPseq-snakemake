@@ -47,10 +47,9 @@ params:
     # -log10 pvalue for peak filtering -corresponds to the 8th column of the narrowPeak file. Default 10.
     filt_peaks_pval: "10"
   edd:
-    blacklist_regions: ""
-    bin_size: 
-    gap_penalty: 
-    
+    blacklist_regions: "/shares/CIBIO-Storage/GROUPS/sharedLC/Davide/mouse_genome/mm10-blacklist.v2.bed"
+    bin_size: # to implement in needed 
+    gap_penalty: # to implement in needed
 
 # Determine the region corresponding to promoters around TSS
 promoter:

@@ -72,24 +72,19 @@ rule call_peaks_edd:
         case      = "results/02aln/{sample}.bam",
         reference = "results/02aln/{control}.bam"
     output: 
-        regions_edd = "results/05peak_edd/{sample}_{control}/{sample}_{control}_edd_peaks.bed",
+        regions_edd = "results/05peak_edd/{sample}_{control}/{sample}_{control}_edd_peaks.bed"
     log:
         "results/00log/edd/{sample}_{control}_edd.log"
     params:
         out_dir            = "results/05peak_edd/{sample}_{control}/",
-        blaklisted_regions = config["params"["edd"]]["blacklist_regions"]
+        blacklisted_regions = config["params"["edd"]]["blacklist_regions"],
         chr_size           = config["ref"]["chr_sizes"]
     message: 
-        
         "call_peaks EDD with input {input.reference} for sample {input.case}"
-
     shell:
         """
-        edd --config-file {params.config_file_edd} \
-            --bin-size 10 \
-            --gap-penalty 6 \
-            {params.chr_size}  \
-            {params.blaklisted_regions}  \
+        edd {params.chr_size}  \
+            {params.blacklisted_regions}  \
             {input.case} \
             {input.reference} \
             {params.out_dir}
