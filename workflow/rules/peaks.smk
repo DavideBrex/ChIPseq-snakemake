@@ -65,8 +65,6 @@ rule call_peaks_broad:
             {params.macs2_params} 2> {log}            
         """
 
-"results/05peak_edd/{sample}_{control}/{sample}.bed
-
 rule call_peaks_edd:
     input: 
         case      = "results/02aln/{sample}.bam",

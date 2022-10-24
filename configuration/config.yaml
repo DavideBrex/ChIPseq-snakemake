@@ -48,8 +48,8 @@ params:
     filt_peaks_pval: "10"
   edd:
     blacklist_regions: "/shares/CIBIO-Storage/GROUPS/sharedLC/Davide/mouse_genome/mm10-blacklist.v2.bed"
-    bin_size: # to implement in needed 
-    gap_penalty: # to implement in needed
+    bin_size: # to implement if needed 
+    gap_penalty: # to implement if needed
 
 # Determine the region corresponding to promoters around TSS
 promoter:
