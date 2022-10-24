@@ -4,7 +4,7 @@ rule call_peaks:
         reference = "results/02aln/{control}.bam"
     output: 
         narrowPeak = "results/03peak_macs2/{sample}_{control}/{sample}_peaks.narrowPeak",
-	summit     = "results/03peak_macs2/{sample}_{control}/{sample}_summits.bed",
+	    summit     = "results/03peak_macs2/{sample}_{control}/{sample}_summits.bed",
         xls        = "results/03peak_macs2/{sample}_{control}/{sample}_peaks.xls"
     log:
         "results/00log/macs2/{sample}_{control}_macs2.log"
@@ -65,6 +65,37 @@ rule call_peaks_broad:
             {params.macs2_params} 2> {log}            
         """
 
+"results/05peak_edd/{sample}_{control}/{sample}.bed
+
+rule call_peaks_edd:
+    input: 
+        case      = "results/02aln/{sample}.bam",
+        reference = "results/02aln/{control}.bam"
+    output: 
+        regions_edd = "results/05peak_edd/{sample}_{control}/{sample}_{control}_edd_peaks.bed",
+    log:
+        "results/00log/edd/{sample}_{control}_edd.log"
+    params:
+        out_dir            = "results/05peak_edd/{sample}_{control}/",
+        blaklisted_regions = config["params"["edd"]]["blacklist_regions"]
+        chr_size           = config["ref"]["chr_sizes"]
+    message: 
+        
+        "call_peaks EDD with input {input.reference} for sample {input.case}"
+
+    shell:
+        """
+        edd --config-file {params.config_file_edd} \
+            --bin-size 10 \
+            --gap-penalty 6 \
+            {params.chr_size}  \
+            {params.blaklisted_regions}  \
+            {input.case} \
+            {input.reference} \
+            {params.out_dir}
+        """
+
+        
 
 rule filter_peaks:
     input:

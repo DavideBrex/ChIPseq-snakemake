@@ -34,8 +34,11 @@ ALL_CONTROLS = IPS.INPUT
 CONTROLS_G   = IPS.GENOME
 
 
+# see whether we should run EDD (wide domains caller for e.g. H3K9me2)
+EDD_samples = SAMPLES[SAMPLES["CALL_WIDE_DOMAINS"] == True]
+
 # Define the output files for the rule ALL
-ALL_PEAKANNOT    = expand("results/04peak_annot/{sample}_{control}/{sample}_peaks_p" + config["params"]["macs2"]["filt_peaks_pval"] + ".annot", zip, sample = ALL_IP, control = ALL_CONTROLS)
+ALL_PEAKANNOT    = expand("results/04peak_annot/{sample}_{control}/{sample  }_peaks_p" + config["params"]["macs2"]["filt_peaks_pval"] + ".annot", zip, sample = ALL_IP, control = ALL_CONTROLS)
 ALL_PEAKS        = expand("results/03peak_macs2/{sample}_{control}/{sample}_peaks.narrowPeak", zip, sample = ALL_IP, control = ALL_CONTROLS)
 ALL_BROAD_PEAKS  = expand("results/03peak_macs2/{sample}_{control}/broad/{sample}_peaks.broadPeak", zip, sample=ALL_IP, control=ALL_CONTROLS)
 ALL_BIGWIG       = expand("results/06bigwig/{sample}_{control}.bw", zip, sample = ALL_IP, control = ALL_CONTROLS)
@@ -44,6 +47,12 @@ ALL_QC           = ["results/01qc/multiqc/multiqc_report.html"]
 ALL_BIGWIG_NOSUB = expand("results/06bigwig/noSubtract/{sample}_{input}.bw", zip, sample = SAMPLES.NAME, input = SAMPLES.INPUT_SPIKE)
 ALL_BW2SERVER    = expand("results/temp_file_{sample}_{input}_{control}.txt",  zip, sample = ALL_IP, input = SAMPLES.INPUT_SPIKE, control = ALL_CONTROLS)
 
+if not EDD_samples.empty:
+
+    IPS_EDD          = EDD_samples[ EDD_samples["IS_INPUT"] == False ]
+    IPS_EDD_NAME     = IPS_EDD.NAME
+    CONTROLS_NAME    = IPS_EDD.INPUT
+    ALL_WIDE_PEAKS = expand("results/05peak_edd/{sample}_{control}/{sample}.bed", zip, sample=IPS_EDD_NAME, control=CONTROLS_NAME)
 
 #-------------------- Set variables and target files to prepare data for GEO upload -----------------------#
 ALL_IP_SE = set(units[units['fq2'].isnull()]['sample'])
@@ -77,8 +86,15 @@ localrules: cp_fastq_pe, cp_fastq_se, filter_peaks, all, all_broad, all_GC, all_
 #-----------------------------------------------------------------------------------------------------------------------
 # Define multiple outputs based on the output files desired
 #-----------------------------------------------------------------------------------------------------------------------
+
+if not EDD_samples.empty:
+    standard_rules  = ALL_PEAKS + ALL_PEAKANNOT + ALL_BIGWIG + ALL_QC + ALL_BIGWIG_NOSUB + ALL_WIDE_PEAKS
+else:
+    standard_rules  = ALL_PEAKS + ALL_PEAKANNOT + ALL_BIGWIG + ALL_QC + ALL_BIGWIG_NOSUB
+
 rule all:
-    input:  ALL_PEAKS + ALL_PEAKANNOT + ALL_BIGWIG + ALL_QC + ALL_BIGWIG_NOSUB
+    input:  
+        standard_rules
 
 rule all_broad:
     input:  ALL_PEAKS + ALL_PEAKANNOT + ALL_BIGWIG + ALL_QC + ALL_BIGWIG_NOSUB + ALL_BROAD_PEAKS
@@ -120,5 +136,5 @@ onerror:
     shell(
     """
     qselect -u `whoami` -s E | xargs qdel -Wforce # Make sure we delete jobs in E state
-    mail -s "An error occurred. ChIP-seq snakemake workflow aborted" `whoami`@ieo.it < {log}
+    mail -s "An error occurred. ChIP-seq snakemake workflow aborted" `whoami`@unitn.it < {log}
     """)

@@ -46,6 +46,11 @@ params:
     pvalue_broad: 1e-5
     # -log10 pvalue for peak filtering -corresponds to the 8th column of the narrowPeak file. Default 10.
     filt_peaks_pval: "10"
+  edd:
+    blacklist_regions: ""
+    bin_size: 
+    gap_penalty: 
+    
 
 # Determine the region corresponding to promoters around TSS
 promoter:
