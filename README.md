@@ -1,4 +1,4 @@
-# Pasini's lab ChIP-seq pipeline
+#  ChIP-seq pipeline
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥5.4.3-brightgreen.svg)](https://snakemake.bitbucket.io)
 
